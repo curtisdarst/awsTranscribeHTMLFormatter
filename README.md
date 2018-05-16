@@ -7,3 +7,5 @@ Using AWS Transcribe service, take the JSON output and output HTML into a nice c
 
 Added the jQuery Inline/In-Place Edit Plugin, which can be found here. https://github.com/caphun/jquery.inlineedit
 
+Example of AWS Transcribe output:
+https://docs.aws.amazon.com/transcribe/latest/dg/how-it-works.html#output
