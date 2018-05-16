@@ -1,0 +1,62 @@
+{
+    "jobName": "job ID",
+    "accountId": "account ID",
+    "results": {
+        "transcripts": [
+            {
+                "transcript": " that's no answer"
+            }
+        ],
+        "items": [
+            {
+                "start_time": "0.180",
+                "end_time": "0.470",
+                "alternatives": [
+                    {
+                        "confidence": 0.84,
+                        "content": "that's"
+                    }
+                ],
+                "type": "pronunciation"
+            },
+            {
+                "start_time": "0.0",
+                "end_time": "0.1",
+                "alternatives": [
+                    {
+                        "confidence": "1.0000",
+                        "content": "no"
+                    }
+                ],
+                "type": "pronunciation"
+            },
+            {
+                "start_time": "0.1",
+                "end_time": "0.2",
+                "alternatives": [
+                    {
+                        "confidence": "1.0000",
+                        "content": "answer"
+                    }
+                ],
+                "type": "pronunciation"
+            }
+        ],
+        "speaker_labels": {
+            "speakers": 2,
+            "items": [
+                {
+                    "start_time": 0,
+                    "end_time": 0.1,
+                    "speaker": "sp_0"
+                },
+                {
+                    "start_time": 0.1,
+                    "end_time": 0.2,
+                    "speaker": "sp_1"
+                }
+            ]
+        },
+        "status": "COMPLETED"
+    }
+}
