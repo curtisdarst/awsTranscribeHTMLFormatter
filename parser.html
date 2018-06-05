@@ -6,7 +6,7 @@
 			</title>
 			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 			<script type="text/javascript" src="jquery.inlineEdit.js"></script>
-
+			<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
 			<style>
 			textarea{
 			width:100%;
@@ -15,7 +15,6 @@
 			</style>
 		</head>
 		<body>
-
 			<div class="container">
   <div id="AWSTranscribeJobname">JobName:</div>
   <div id="AWSTranscribejobStatus">Job Status:</div>
@@ -28,29 +27,18 @@
   <div id="AWSTranscribeTextItems">Raw Text Items:</div>
   </div>
 </div>
-
 <BR>
 		</body>
-		
-		
-		<!-- Example from http://api.jquery.com/jQuery.getJSON/--->
 		<script>
-		
-		
 		/*Set speaker names */
 		var speakerNames = {};
-		speakerNames['spk_0'] = "Cliff Harris";
-		speakerNames['spk_1'] = "Tony Chan";
-		
-		
+		speakerNames['spk_0'] = "Speaker #1";
+		speakerNames['spk_1'] = "Speaker #2";
+			<!-- Example from http://api.jquery.com/jQuery.getJSON/--->
 			$.getJSON( "ajax/asrOutput.json", function( data ) {
-			
-						
 			  var items = [];
-
 			  $.each( data, function( key, val ) {
 				items.push( "<li id='" + key + "'>" + val + "</li>" );
-				
 				switch(key)
 				{
 				case "jobName":
@@ -65,18 +53,13 @@
 				case "results":
 					/*$( "<span>"+val+"</span>" ).appendTo( "#AWSTranscriberesults");*/
 					/*This is going to be everything else. Like text, speaker stuff, etc*/
-					
 					/*For starters, there is a transcriptsobject. shown below
 					["transcripts":[{"transcript":"lots and lots of text"}]]
 					*/
 					$( "<span>"+JSON.stringify(val.transcripts[0].transcript)+"</span>" ).appendTo( "#AWSTranscriberesults");
-					
-					
-					
 					/* Speaker Information*/
 					/***********************/
 					$( "<span>"+JSON.stringify(val.speaker_labels.speakers)+"</span>" ).appendTo( "#AWSTranscribenumberOfSpeakers");
-					
 					/*Loop through the speakers.segments array*/
 					var speakers = [];
 					var current_speaker ="";
@@ -84,30 +67,22 @@
 						if(valSpeaker.speaker_label != current_speaker)
 						{
 						speakers.push(JSON.stringify(valSpeaker.speaker_label) + " " + JSON.stringify(valSpeaker.start_time) + " " + JSON.stringify(valSpeaker.end_time));
-						
 						/*START: Pull all words/items until next speaker */
-						
-						
 					/* Items Information*/
 					/*Loop through the items array*/
 					var textItems = [];
 					var textString ="";
-					
 					textString += "<p> Speaker Change @ "+parseFloat(valSpeaker.start_time)+"s: " + speakerNames[valSpeaker.speaker_label] + "</p>";
-					
 					/*start off with p tag*/
 					textString += "<p>";
 					var textfound = 0;
 					$.each( val.items, function( keyItems, valItems ) {
-					
-												
 						if(parseFloat(valSpeaker.start_time)<=parseFloat(valItems.start_time) && parseFloat(valItems.end_time)<=parseFloat(valSpeaker.end_time))
 						{
 						textfound++;
 						/*textItems.push(JSON.stringify(valItems.alternatives[0].content) + " " + JSON.stringify(valItems.start_time) + " " + JSON.stringify(valItems.end_time));*/
 						/*word boundary*/
 						var wordBoundary ="";
-						
 						switch(valItems.type)
 						{
 						case "pronunciation":
@@ -119,87 +94,84 @@
 						default:
 						wordBoundary = "";
 						}
-						
-						/*Fixing some simple errors*/
-						
+						/*Fixing some simple errors
+						Reasoning: Seems like the i noun is not capitalized in the result from trascribe*/
 						switch(valItems.alternatives[0].content)
 						{
-						case "i":
-						valItems.alternatives[0].content = "I";
-						break;
-						
-						case "i'm":
-						valItems.alternatives[0].content = "I'm";
-						break;
-						
-						case "i'd":
-						valItems.alternatives[0].content = "I'd";
-						break;
-						default:
+							case "i":
+							valItems.alternatives[0].content = "I";
+							break;
+							case "i'm":
+							valItems.alternatives[0].content = "I'm";
+							break;
+							case "i'd":
+							valItems.alternatives[0].content = "I'd";
+							break;
+							case "i've":
+							valItems.alternatives[0].content = "I've";
+							break;
+							default:
 						}
-						
 						/* Push to two vars. One being array other being formatted text*/
 						textItems.push(JSON.stringify(valItems.alternatives[0].content) + wordBoundary);
 						textString += wordBoundary + JSON.stringify(valItems.alternatives[0].content).replace(/\"/g, "") ;
 						}
-						
 					})
-					
 					/*end with p tag */
 					textString += "</p>";
-					
 					if(textfound != 0)
 						{
 						$( "<span class=\"editable\">"+textString+"</span>" ).appendTo( "#AWSTranscribeTextItems");
 						}
-						
-						
 						/*END : Pull all words/items until next speaker */
 						}
 					})
-					
-					
-					
-					
 					$( "<span>"+speakers+"</span>" ).appendTo( "#AWSTranscribeSpeakers");
-					
-					
-					
-					
-					
-					
 					break;
-					
 				default:
 					/*Not sure what to do here */
 					break;
 				}
-				
 			  });
-			 
 			  $( "<ul/>", {
 				"class": "my-new-list",
 				html: items.join( "" )
 			  }).appendTo( "body" );
-			  
-			  
-			  
-			  
-			  
-			  
 			});
 		</script>
-		
 		<script type="text/javascript">
-
-
 $(function() {
   $('.editable').inlineEdit({
     control: 'textarea',
-    
   });
 });
-
 </script>
+<button onclick="copyToClipboard('AWSTranscribeTextItems'); alert('COPIED')">Copy AWSTranscribeTextItems</button>
 
-	</html>
+<!--- see solution from Alvaro Montoro on https://stackoverflow.com/questions/22581345/click-button-copy-to-clipboard-using-jquery --->
+<script>
+function copyToClipboard(elementId) {
+
+  // Create a "hidden" input
+  var aux = document.createElement("input");
+
+  //TODO: Find and replace any of the spans used for the inline formatter
+  var tmpText = document.getElementById(elementId).innerHTML
+  
+  // Assign it the value of the specified element
+  aux.setAttribute("value", tmpText);
+
+  // Append it to the body
+  document.body.appendChild(aux);
+  
+  // Highlight its content
+  aux.select();
+
+  // Copy the highlighted text
+  document.execCommand("copy");
+
+  // Remove it from the body
+  document.body.removeChild(aux);
+}
+</script>
+</html>
